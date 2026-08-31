@@ -29,15 +29,31 @@ export function getImageProxyUrl(): string | null {
 }
 
 /**
+ * 修复豆瓣图片 URL：豆瓣近期对海报图强制使用 webp，.jpg 会 403/404
+ * 例如：https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2933198755.jpg
+ *   -> https://img9.doubanio.com/view/photo/s_ratio_poster/public/p2933198755.webp
+ */
+export function fixDoubanImageUrl(originalUrl: string): string {
+  if (!originalUrl) return originalUrl;
+  if (!originalUrl.includes('doubanio.com')) return originalUrl;
+  // 将 .jpg/.jpeg/.png 结尾（可能带 query）统一替换为 .webp
+  return originalUrl.replace(/\.(jpe?g|png)(\?.*)?$/i, (_m, _ext, query) => {
+    return `.webp${query || ''}`;
+  });
+}
+
+/**
  * 处理图片 URL，如果设置了图片代理则使用代理
  */
 export function processImageUrl(originalUrl: string): string {
   if (!originalUrl) return originalUrl;
 
-  const proxyUrl = getImageProxyUrl();
-  if (!proxyUrl) return originalUrl;
+  const fixedUrl = fixDoubanImageUrl(originalUrl);
 
-  return `${proxyUrl}${encodeURIComponent(originalUrl)}`;
+  const proxyUrl = getImageProxyUrl();
+  if (!proxyUrl) return fixedUrl;
+
+  return `${proxyUrl}${encodeURIComponent(fixedUrl)}`;
 }
 
 /**
