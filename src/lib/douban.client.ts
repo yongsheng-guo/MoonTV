@@ -1,5 +1,5 @@
 import { DoubanItem, DoubanResult } from './types';
-import { getDoubanProxyUrl } from './utils';
+import { fixDoubanImageUrl, getDoubanProxyUrl } from './utils';
 
 interface DoubanCategoriesParams {
   kind: 'tv' | 'movie';
@@ -108,7 +108,7 @@ export async function fetchDoubanCategories(
     const list: DoubanItem[] = doubanData.items.map((item) => ({
       id: item.id,
       title: item.title,
-      poster: item.pic?.normal || item.pic?.large || '',
+      poster: fixDoubanImageUrl(item.pic?.normal || item.pic?.large || ''),
       rate: item.rating?.value ? item.rating.value.toFixed(1) : '',
       year: item.card_subtitle?.match(/(\d{4})/)?.[1] || '',
     }));
@@ -235,7 +235,7 @@ export async function fetchDoubanList(
     const list: DoubanItem[] = doubanData.items.map((item) => ({
       id: item.id,
       title: item.title,
-      poster: item.pic?.normal || item.pic?.large || '',
+      poster: fixDoubanImageUrl(item.pic?.normal || item.pic?.large || ''),
       rate: item.rating?.value ? item.rating.value.toFixed(1) : '',
       year: item.card_subtitle?.match(/(\d{4})/)?.[1] || '',
     }));

@@ -3,6 +3,12 @@ import { NextResponse } from 'next/server';
 import { getCacheTime } from '@/lib/config';
 import { DoubanItem, DoubanResult } from '@/lib/types';
 
+function fixDoubanImageUrl(url: string): string {
+  if (!url) return url;
+  if (!url.includes('doubanio.com')) return url;
+  return url.replace(/\.(jpe?g|png)(\?.*)?$/i, (_m, _ext, query) => `.webp${query || ''}`);
+}
+
 interface DoubanApiResponse {
   subjects: Array<{
     id: string;
@@ -98,7 +104,7 @@ export async function GET(request: Request) {
     const list: DoubanItem[] = doubanData.subjects.map((item) => ({
       id: item.id,
       title: item.title,
-      poster: item.cover,
+      poster: fixDoubanImageUrl(item.cover),
       rate: item.rate,
       year: '',
     }));
@@ -167,7 +173,7 @@ function handleTop250(pageStart: number) {
         const rate = match[4] || '';
 
         // 处理图片 URL，确保使用 HTTPS
-        const processedCover = cover.replace(/^http:/, 'https:');
+        const processedCover = fixDoubanImageUrl(cover.replace(/^http:/, 'https:'));
 
         movies.push({
           id: id,
