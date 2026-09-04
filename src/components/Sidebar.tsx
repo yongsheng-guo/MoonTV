@@ -34,10 +34,11 @@ const Logo = () => {
       href='/'
       className='flex items-center justify-center h-16 select-none hover:opacity-80 transition-opacity duration-200 gap-2'
     >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src='/logo.png'
         alt='Logo'
-        className='w-8 h-8 rounded-full object-cover'
+        className='w-8 h-8 object-contain'
         onError={(e) => {
           (e.target as HTMLImageElement).style.display = 'none';
         }}
@@ -144,14 +145,14 @@ const Sidebar = ({ onToggle, activePath = '/' }: SidebarProps) => {
       href: '/douban?type=tv',
     },
     {
-      icon: Clover,
-      label: '综艺',
-      href: '/douban?type=show',
-    },
-    {
       icon: Cat,
       label: '动漫',
       href: '/douban?type=anime',
+    },
+    {
+      icon: Clover,
+      label: '综艺',
+      href: '/douban?type=show',
     },
   ]);
 
