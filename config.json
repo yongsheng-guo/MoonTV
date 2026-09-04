@@ -73,6 +73,10 @@
     "apibdzy": {
       "api": "https://api.apibdzy.com/api.php/provide/vod",
       "name": "百度云资源"
+    },
+    "ruyi": {
+      "api": "http://cj.rycjapi.com/api.php/provide/vod",
+      "name": "如意资源"
     }
   }
 }
