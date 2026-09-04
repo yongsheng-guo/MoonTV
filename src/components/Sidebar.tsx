@@ -2,7 +2,7 @@
 
 'use client';
 
-import { Clover, Film, Home, Menu, Search, Star, Tv } from 'lucide-react';
+import { Cat, Clover, Film, Home, Menu, Search, Star, Tv } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -32,8 +32,16 @@ const Logo = () => {
   return (
     <Link
       href='/'
-      className='flex items-center justify-center h-16 select-none hover:opacity-80 transition-opacity duration-200'
+      className='flex items-center justify-center h-16 select-none hover:opacity-80 transition-opacity duration-200 gap-2'
     >
+      <img
+        src='/logo.png'
+        alt='Logo'
+        className='w-8 h-8 rounded-full object-cover'
+        onError={(e) => {
+          (e.target as HTMLImageElement).style.display = 'none';
+        }}
+      />
       <span className='text-2xl font-bold text-green-600 tracking-tight'>
         {siteName}
       </span>
@@ -139,6 +147,11 @@ const Sidebar = ({ onToggle, activePath = '/' }: SidebarProps) => {
       icon: Clover,
       label: '综艺',
       href: '/douban?type=show',
+    },
+    {
+      icon: Cat,
+      label: '动漫',
+      href: '/douban?type=anime',
     },
   ]);
 
