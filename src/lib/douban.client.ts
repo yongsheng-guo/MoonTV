@@ -163,6 +163,32 @@ export async function getDoubanCategories(
   }
 }
 
+
+/**
+ * 动漫榜单数据获取函数：走豆瓣选片接口，支持排序（U 热门 / T 最新 / S 评分最高）
+ */
+export async function getDoubanAnime(params: {
+  sort: 'U' | 'T' | 'S';
+  pageLimit?: number;
+  pageStart?: number;
+}): Promise<DoubanResult> {
+  const { sort = 'U', pageLimit = 25, pageStart = 0 } = params;
+  const response = await fetch(
+    `/api/douban/anime?sort=${sort}&limit=${pageLimit}&start=${pageStart}`
+  );
+  if (!response.ok) {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('globalError', {
+          detail: { message: '获取豆瓣分类数据失败' },
+        })
+      );
+    }
+    throw new Error('获取豆瓣分类数据失败');
+  }
+  return response.json();
+}
+
 interface DoubanListParams {
   tag: string;
   type: string;
