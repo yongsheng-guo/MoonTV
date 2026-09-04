@@ -42,6 +42,7 @@ function DoubanPageClient() {
     if (type === 'movie') return '全部';
     if (type === 'tv') return 'tv';
     if (type === 'show') return 'show';
+    if (type === 'anime') return 'tv_animation';
     return '全部';
   });
 
@@ -105,6 +106,9 @@ function DoubanPageClient() {
       } else if (type === 'show') {
         setPrimarySelection('');
         setSecondarySelection('show');
+      } else if (type === 'anime') {
+        setPrimarySelection('');
+        setSecondarySelection('tv_animation');
       } else {
         setPrimarySelection('');
         setSecondarySelection('全部');
@@ -125,6 +129,17 @@ function DoubanPageClient() {
   // 生成API请求参数的辅助函数
   const getRequestParams = useCallback(
     (pageStart: number) => {
+      // 动漫类型：复用豆瓣剧集的热门动漫榜单
+      if (type === 'anime') {
+        return {
+          kind: 'tv' as const,
+          category: 'tv',
+          type: 'tv_animation',
+          pageLimit: 25,
+          pageStart,
+        };
+      }
+
       // 当type为tv或show时，kind统一为'tv'，category使用type本身
       if (type === 'tv' || type === 'show') {
         return {
@@ -362,6 +377,8 @@ function DoubanPageClient() {
       ? '电视剧'
       : type === 'show'
       ? '综艺'
+      : type === 'anime'
+      ? '动漫'
       : '自定义';
   };
 
@@ -390,7 +407,7 @@ function DoubanPageClient() {
           </div>
 
           {/* 选择器组件 */}
-          {type !== 'custom' ? (
+          {type === 'anime' ? null : type !== 'custom' ? (
             <div className='bg-white/60 dark:bg-gray-800/40 rounded-2xl p-4 sm:p-6 border border-gray-200/30 dark:border-gray-700/30 backdrop-blur-sm'>
               <DoubanSelector
                 type={type as 'movie' | 'tv' | 'show'}
