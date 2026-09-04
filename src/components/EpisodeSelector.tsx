@@ -40,6 +40,8 @@ interface EpisodeSelectorProps {
   sourceSearchError?: string | null;
   /** 预计算的测速结果，避免重复测速 */
   precomputedVideoInfo?: Map<string, VideoInfo>;
+  /** 真实分集标题，例如 20260307上 */
+  episodes_titles?: string[];
 }
 
 /**
@@ -58,6 +60,7 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
   sourceSearchLoading = false,
   sourceSearchError = null,
   precomputedVideoInfo,
+  episodes_titles,
 }) => {
   const router = useRouter();
   const pageCount = Math.ceil(totalEpisodes / episodesPerPage);
@@ -390,8 +393,8 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
             </button>
           </div>
 
-          {/* 集数网格 */}
-          <div className='grid grid-cols-[repeat(auto-fill,minmax(40px,1fr))] auto-rows-[40px] gap-x-3 gap-y-3 overflow-y-auto h-full pb-4'>
+          {/* 集数网格 - 支持真实标题 flex wrap */}
+          <div className='flex flex-wrap gap-2 overflow-y-auto h-full pb-4'>
             {(() => {
               const len = currentEnd - currentStart + 1;
               const episodes = Array.from({ length: len }, (_, i) =>
@@ -400,18 +403,35 @@ const EpisodeSelector: React.FC<EpisodeSelectorProps> = ({
               return episodes;
             })().map((episodeNumber) => {
               const isActive = episodeNumber === value;
+              // 获取真实标题，带 fallback 逻辑
+              const rawTitle = episodes_titles?.[episodeNumber - 1];
+              let displayTitle: string = `${episodeNumber}`;
+              if (rawTitle) {
+                // 尝试提取第X集中的标题？若标题本身就是真实标题如 20260307上 则直接使用
+                // 若标题包含 "第" 和 "集" 尝试提取中间，但保留原始作为优先
+                const trimmed = rawTitle.trim();
+                if (trimmed) {
+                  // 第X集提取逻辑：若格式为 "第2集" 保留，否则使用完整标题
+                  if (trimmed.length <= 12) {
+                    displayTitle = trimmed;
+                  } else {
+                    displayTitle = trimmed.slice(0, 12);
+                  }
+                }
+              }
               return (
                 <button
                   key={episodeNumber}
                   onClick={() => handleEpisodeClick(episodeNumber - 1)}
-                  className={`h-10 flex items-center justify-center text-sm font-medium rounded-md transition-all duration-200 
+                  title={rawTitle || `第${episodeNumber}集`}
+                  className={`min-w-[60px] px-3 h-10 flex items-center justify-center text-sm font-medium rounded-md transition-all duration-200 
                     ${
                       isActive
                         ? 'bg-green-500 text-white shadow-lg shadow-green-500/25 dark:bg-green-600'
                         : 'bg-gray-200 text-gray-700 hover:bg-gray-300 hover:scale-105 dark:bg-white/10 dark:text-gray-300 dark:hover:bg-white/20'
                     }`.trim()}
                 >
-                  {episodeNumber}
+                  {displayTitle}
                 </button>
               );
             })}
